@@ -1,0 +1,15 @@
+/**:
+  airbot_joy_node:
+    ros__parameters:
+      system_timeout_status:
+        - "BodyImu"
+        - "Camera"
+        - "FaceTof"
+        - "NeckTof"
+        - "LeftBattery"
+        - "RightBattery"
+        - "PowerStatus"
+        - "Joy"
+        - "Robot"
+        
+  
