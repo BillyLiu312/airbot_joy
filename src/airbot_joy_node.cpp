@@ -37,7 +37,7 @@ AirbotJoyNode::AirbotJoyNode(const rclcpp::NodeOptions & options) : Node("airbot
     this->get_logger().set_level(rclcpp::Logger::Level::Info);
   }
 
-  RCLCPP_DEBUG(this->get_logger(), "Audio interaction node is started");
+  RCLCPP_DEBUG(this->get_logger(), "airbot joy node node is started");
   joy_sub_ = this->create_subscription<sensor_msgs::msg::Joy>(
     tita_topic::joy, 10, std::bind(&AirbotJoyNode::joy_cb, this, std::placeholders::_1));
   param_subscriber_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
@@ -54,10 +54,13 @@ AirbotJoyNode::AirbotJoyNode(const rclcpp::NodeOptions & options) : Node("airbot
   // // 调用服务获取参数
   // get_parameter("use_sdk");
   auto cb = [this](const rclcpp::Parameter & p) {
-    RCLCPP_INFO(
-      this->get_logger(), "cb2: Received an update to parameter \"%s\" of type: %s: \"%d\"",
-      p.get_name().c_str(), p.get_type_name().c_str(), p.as_bool());
+    // RCLCPP_INFO(
+    //   this->get_logger(), "cb2: Received an update to parameter \"%s\" of type: %s: \"%d\"",
+    //   p.get_name().c_str(), p.get_type_name().c_str(), p.as_bool());
     use_sdk_ = p.as_bool();
+    if(use_sdk_){
+      RCLCPP_INFO(this->get_logger(), "use_sdk_ is true");
+    }
   };
   cb_handle_ = param_subscriber_->add_parameter_callback("use_sdk", cb, "active_command_node");
 }
@@ -73,15 +76,36 @@ void AirbotJoyNode::joy_cb(const sensor_msgs::msg::Joy::SharedPtr msg)
     new_msg->axes[1] = -msg->axes[2];
     new_msg->axes[2] = msg->axes[0];
     new_msg->axes[3] = -msg->axes[1];
-    if(msg->axes[6] == -1){
-      new_msg->buttons[5] = 1;
+    if(msg->axes[7] == 1){    // right upper switch
+      new_msg->buttons[4] = 0;
+      new_msg->buttons[6] = 1;
+      if(msg->axes[6] == -1){ // right down trigger
+        new_msg->buttons[0] = 1;
+      }
+      else{
+        new_msg->buttons[0] = 0;
+      }
     }
-    else{
-      new_msg->buttons[5] = 0;
+    else if(msg->axes[7] == 0){
+      new_msg->buttons[4] = 1;
+      new_msg->buttons[7] = 0;
+      if(msg->axes[6] == -1){
+        new_msg->buttons[6] = 1;
+      }
+      else{
+        new_msg->buttons[6] = 0;
+      }
+    }
+    else if(msg->axes[7] == -1){
+      if(msg->axes[6] == -1){
+        new_msg->buttons[5] = 1;
+      }
+      else{
+        new_msg->buttons[5] = 0;
+      }
     }
 
     joy_publisher_->publish(*new_msg);
-    RCLCPP_DEBUG(this->get_logger(), "Received joy message");
   }
 }
 // not use 
