@@ -24,6 +24,10 @@
 #include "sensor_msgs/msg/joy.hpp"
 #include "tita_utils/topic_names.hpp"
 
+#include "arx5_arm_msg/msg/robot_cmd.hpp"
+#include "arx5_arm_msg/msg/robot_status.hpp"
+#include "arm_control/msg/pos_cmd.hpp"
+
 namespace airbot_joy
 {
 class AirbotJoyNode : public rclcpp::Node

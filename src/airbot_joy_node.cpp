@@ -41,7 +41,7 @@ AirbotJoyNode::AirbotJoyNode(const rclcpp::NodeOptions & options) : Node("airbot
   joy_sub_ = this->create_subscription<sensor_msgs::msg::Joy>(
     tita_topic::joy, 10, std::bind(&AirbotJoyNode::joy_cb, this, std::placeholders::_1));
   param_subscriber_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
-  joy_publisher_ = this->create_publisher<sensor_msgs::msg::Joy>("/airbot_play/joy", 10);
+  joy_publisher_ = this->create_publisher<arx5_arm_msg::msg::RobotCmd>("/arx5_arm_msg/joy", 1);
 
   client_ =
     this->create_client<rcl_interfaces::srv::GetParameters>("active_command_node/get_parameters");
