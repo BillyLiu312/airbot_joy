@@ -7,7 +7,7 @@
     语言：<a href="./docs/docs_en/README_EN.md"><strong>English</strong></a> / <strong>中文</strong>
 </p>
 
-    airbot使用BATAFPV遥控器（tita自带）来控制机械臂
+    arx_x5使用BATAFPV遥控器（tita自带）来控制机械臂
 
 ## Build Package
 

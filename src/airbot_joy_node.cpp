@@ -68,44 +68,53 @@ void AirbotJoyNode::joy_cb(const sensor_msgs::msg::Joy::SharedPtr msg)
 {
   // get_param("use_sdk");
   if (use_sdk_) {
-    auto new_msg = std::make_shared<sensor_msgs::msg::Joy>();
-    new_msg->header = msg->header;
-    new_msg->axes.resize(6);
-    new_msg->buttons.resize(12);
-    new_msg->axes[0] = msg->axes[3];
-    new_msg->axes[1] = -msg->axes[2];
-    new_msg->axes[2] = msg->axes[0];
-    new_msg->axes[3] = -msg->axes[1];
-    if(msg->axes[7] == 1){    // right upper switch
-      new_msg->buttons[4] = 0;
-      new_msg->buttons[6] = 1;
-      if(msg->axes[6] == -1){ // right down trigger
-        new_msg->buttons[0] = 1;
-      }
-      else{
-        new_msg->buttons[0] = 0;
-      }
-    }
-    else if(msg->axes[7] == 0){
-      new_msg->buttons[4] = 1;
-      new_msg->buttons[7] = 0;
-      if(msg->axes[6] == -1){
-        new_msg->buttons[6] = 1;
-      }
-      else{
-        new_msg->buttons[6] = 0;
-      }
-    }
-    else if(msg->axes[7] == -1){
-      if(msg->axes[6] == -1){
-        new_msg->buttons[5] = 1;
-      }
-      else{
-        new_msg->buttons[5] = 0;
-      }
-    }
+    // auto new_msg = std::make_shared<sensor_msgs::msg::Joy>();
+    auto cmd_msg = std::make_shared<arx5_arm_msg::msg::RobotCmd>();
+    cmd_msg->header = msg->header;
+    // new_msg->axes.resize(6);
+    // new_msg->buttons.resize(12);
+    // new_msg->axes[0] = msg->axes[3];
+    // new_msg->axes[1] = -msg->axes[2];
+    // new_msg->axes[2] = msg->axes[0];
+    // new_msg->axes[3] = -msg->axes[1];
 
-    joy_publisher_->publish(*new_msg);
+    // 1. 末端位置控制 (左/右摇杆)
+    cmd_msg->mode = 4
+    cmd_msg->end_pos[0] = 0.5 * msg->axes[0];  // X 轴 (左摇杆左右)
+    cmd_msg->end_pos[1] = 0.5 * msg->axes[1];  // Y 轴 (左摇杆上下)
+    cmd_msg->end_pos[2] = 0.5 * msg->axes[3];  // Z 轴 (右摇杆上下)
+    cmd_msg->end_pos[3] = 1.3 * msg->axes[2];  // 末端旋转 (右摇杆左右)
+    cmd_msg->gripper = 2.5 + 2.5 * msg->axes[7]
+    // if(msg->axes[7] == 1){    // right upper switch
+    //   new_msg->buttons[4] = 0;
+    //   new_msg->buttons[6] = 1;
+    //   if(msg->axes[6] == -1){ // right down trigger
+    //     new_msg->buttons[0] = 1;
+    //   }
+    //   else{
+    //     new_msg->buttons[0] = 0;
+    //   }
+    // }
+    // else if(msg->axes[7] == 0){
+    //   new_msg->buttons[4] = 1;
+    //   new_msg->buttons[7] = 0;
+    //   if(msg->axes[6] == -1){
+    //     new_msg->buttons[6] = 1;
+    //   }
+    //   else{
+    //     new_msg->buttons[6] = 0;
+    //   }
+    // }
+    // else if(msg->axes[7] == -1){
+    //   if(msg->axes[6] == -1){
+    //     new_msg->buttons[5] = 1;
+    //   }
+    //   else{
+    //     new_msg->buttons[5] = 0;
+    //   }
+    // }
+
+    joy_publisher_->publish(*cmd_msg);
   }
 }
 // not use 
