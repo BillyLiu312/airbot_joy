@@ -41,7 +41,7 @@ AirbotJoyNode::AirbotJoyNode(const rclcpp::NodeOptions & options) : Node("airbot
   joy_sub_ = this->create_subscription<sensor_msgs::msg::Joy>(
     tita_topic::joy, 10, std::bind(&AirbotJoyNode::joy_cb, this, std::placeholders::_1));
   param_subscriber_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
-  joy_publisher_ = this->create_publisher<arx5_arm_msg::msg::RobotCmd>("/arx5_arm_msg/joy", 1);
+  joy_publisher_ = this->create_publisher<arx5_arm_msg::msg::RobotCmd>("/arm_cmd", 10);
 
   client_ =
     this->create_client<rcl_interfaces::srv::GetParameters>("active_command_node/get_parameters");
@@ -113,6 +113,11 @@ void AirbotJoyNode::joy_cb(const sensor_msgs::msg::Joy::SharedPtr msg)
     //     new_msg->buttons[5] = 0;
     //   }
     // }
+
+    RCLCPP_DEBUG(this->get_logger(), "Command: pos=[%.2f, %.2f, %.2f, %.2f], gripper=%.2f",
+            cmd_msg->end_pos[0], cmd_msg->end_pos[1], 
+            cmd_msg->end_pos[2], cmd_msg->end_pos[3], 
+            cmd_msg->gripper);
 
     joy_publisher_->publish(*cmd_msg);
   }
